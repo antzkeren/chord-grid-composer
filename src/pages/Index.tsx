@@ -5,6 +5,7 @@ import { ChordKeyboard } from '@/components/ChordKeyboard';
 import { SongLibrary } from '@/components/SongLibrary';
 import { useChordGrid } from '@/hooks/useChordGrid';
 import { useSongStorage } from '@/hooks/useSongStorage';
+import { useAuth } from '@/contexts/AuthContext';
 import { Song } from '@/types/song';
 import { toast } from 'sonner';
 import { ChevronUp, ChevronDown, Keyboard } from 'lucide-react';
@@ -12,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const Index = () => {
+  const { user } = useAuth();
   const {
     rows,
     selectedCell,
@@ -75,7 +77,7 @@ const Index = () => {
   }, [rows, songTitle, currentSongId]);
 
   const handleSaveSong = () => {
-    saveSong(songTitle, rows, currentSongId);
+    saveSong(songTitle, rows, currentSongId, user?.name);
     // Update initial state after saving
     initialStateRef.current = { rows: JSON.parse(JSON.stringify(rows)), songTitle, currentSongId };
     toast.success(currentSongId ? 'Lagu diupdate!' : 'Lagu tersimpan!');

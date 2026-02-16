@@ -7,6 +7,7 @@ export interface Song {
   createdAt: string;
   updatedAt: string;
   isBookmarked: boolean;
+  owner?: string; // For shared songs
 }
 
 export interface SongLibrary {

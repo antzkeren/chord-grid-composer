@@ -33,7 +33,7 @@ export function useSongStorage() {
     saveLibrary(library);
   }, [library]);
 
-  const saveSong = useCallback((title: string, rows: ChordRow[], existingId?: string) => {
+  const saveSong = useCallback((title: string, rows: ChordRow[], existingId?: string, owner?: string) => {
     const now = new Date().toISOString();
     
     setLibrary(prev => {
@@ -54,6 +54,7 @@ export function useSongStorage() {
           createdAt: now,
           updatedAt: now,
           isBookmarked: false,
+          owner,
         };
         return { ...prev, songs: [newSong, ...prev.songs] };
       }
