@@ -41,6 +41,7 @@ const Index = () => {
     customChords,
     removeCustomChord,
     duplicateRows,
+    transposeRows,
   } = useChordGrid();
 
   const {
@@ -155,6 +156,11 @@ const Index = () => {
           duplicateRows(rowIds);
           setSelectedRows([]);
           toast.success(`${rowIds.length} baris diduplikasi`);
+        }}
+        onTransposeRows={(rowIds, semitones) => {
+          transposeRows(rowIds, semitones);
+          setSelectedRows([]);
+          toast.success(`${rowIds.length} baris di-transpose ${semitones > 0 ? '+' : ''}${semitones} semitone`);
         }}
         onReorderRows={(newRows) => {
           setRows(newRows);

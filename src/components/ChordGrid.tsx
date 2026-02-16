@@ -1,8 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChordRow } from '@/types/chord';
 import { ChordCellComponent } from './ChordCellComponent';
-import { Plus, Trash2, Tag, Type, X, Copy, Square, CheckSquare, GripVertical } from 'lucide-react';
+import { Plus, Trash2, Tag, Type, X, Copy, Square, CheckSquare, GripVertical, ArrowUpDown } from 'lucide-react';
 import { Button } from './ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from './ui/dialog';
 import {
   DndContext,
   closestCenter,
@@ -28,6 +36,7 @@ interface ChordGridProps {
   onCellSelect: (rowId: string, cellId: string) => void;
   onToggleRowSelect: (rowId: string) => void;
   onDuplicateRows: (rowIds: string[]) => void;
+  onTransposeRows: (rowIds: string[], semitones: number) => void;
   onReorderRows: (newRows: ChordRow[]) => void;
   onAddRow: () => void;
   onDeleteRow: (rowId: string) => void;
@@ -229,6 +238,7 @@ export function ChordGrid({
   onCellSelect,
   onToggleRowSelect,
   onDuplicateRows,
+  onTransposeRows,
   onReorderRows,
   onAddRow,
   onDeleteRow,
@@ -239,6 +249,9 @@ export function ChordGrid({
   onUpdateNote,
   onRemoveNote,
 }: ChordGridProps) {
+  const [transposeDialogOpen, setTransposeDialogOpen] = useState(false);
+  const [selectedSemitones, setSelectedSemitones] = useState(0);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -313,18 +326,31 @@ export function ChordGrid({
             )}
 
             {/* Add Row Button */}
-            <div className="flex items-center gap-2 mt-3 sm:mt-4">
+            <div className="flex flex-wrap items-center gap-2 mt-3 sm:mt-4">
               {selectedRows.length > 0 && (
-                <Button
-                  onClick={() => {
-                    onDuplicateRows(selectedRows);
-                  }}
-                  variant="outline"
-                  className="border-dashed border-primary text-primary hover:bg-primary/10 text-xs sm:text-sm"
-                >
-                  <Copy size={14} className="mr-1 sm:mr-2" />
-                  Duplicate ({selectedRows.length})
-                </Button>
+                <>
+                  <Button
+                    onClick={() => {
+                      onDuplicateRows(selectedRows);
+                    }}
+                    variant="outline"
+                    className="border-dashed border-primary text-primary hover:bg-primary/10 text-xs sm:text-sm"
+                  >
+                    <Copy size={14} className="mr-1 sm:mr-2" />
+                    Duplicate ({selectedRows.length})
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedSemitones(0);
+                      setTransposeDialogOpen(true);
+                    }}
+                    variant="outline"
+                    className="border-dashed border-primary text-primary hover:bg-primary/10 text-xs sm:text-sm"
+                  >
+                    <ArrowUpDown size={14} className="mr-1 sm:mr-2" />
+                    Transpose ({selectedRows.length})
+                  </Button>
+                </>
               )}
               <Button
                 onClick={onAddRow}
@@ -338,6 +364,53 @@ export function ChordGrid({
           </div>
         </SortableContext>
       </DndContext>
+
+      {/* Transpose Dialog */}
+      <Dialog open={transposeDialogOpen} onOpenChange={setTransposeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Transpose Chord</DialogTitle>
+            <DialogDescription>
+              Pilih interval transpose untuk {selectedRows.length} baris yang dipilih
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-4 gap-2 py-4">
+            {[-3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((semitones) => (
+              <Button
+                key={semitones}
+                variant={selectedSemitones === semitones ? 'default' : 'outline'}
+                onClick={() => setSelectedSemitones(semitones)}
+                className="text-sm"
+              >
+                {semitones > 0 ? `+${semitones}` : semitones}
+              </Button>
+            ))}
+          </div>
+          <div className="text-center text-sm text-muted-foreground py-2">
+            {selectedSemitones !== 0 && (
+              <span>
+                {selectedSemitones > 0 ? 'Naik' : 'Turun'} {Math.abs(selectedSemitones)} semitone(s)
+              </span>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTransposeDialogOpen(false)}>
+              Batal
+            </Button>
+            <Button
+              onClick={() => {
+                if (selectedSemitones !== 0) {
+                  onTransposeRows(selectedRows, selectedSemitones);
+                  setTransposeDialogOpen(false);
+                }
+              }}
+              disabled={selectedSemitones === 0}
+            >
+              Terapkan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

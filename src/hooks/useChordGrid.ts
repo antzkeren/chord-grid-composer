@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ChordRow, ChordCell, KEY_FAMILIES, KeyFamily, generateId } from '@/types/chord';
+import { ChordRow, ChordCell, KEY_FAMILIES, KeyFamily, generateId, transposeChord } from '@/types/chord';
 
 const BEATS_PER_ROW = 16;
 
@@ -374,6 +374,24 @@ export function useChordGrid() {
     });
   }, []);
 
+  const transposeRows = useCallback((rowIds: string[], semitones: number) => {
+    if (rowIds.length === 0 || semitones === 0) return;
+    
+    setRows(prev => {
+      return prev.map(row => {
+        if (!rowIds.includes(row.id)) return row;
+        
+        return {
+          ...row,
+          cells: row.cells.map(cell => ({
+            ...cell,
+            chord: transposeChord(cell.chord, semitones),
+          })),
+        };
+      });
+    });
+  }, []);
+
   return {
     rows,
     selectedCell,
@@ -405,5 +423,6 @@ export function useChordGrid() {
     updateCellBeats,
     removeCustomChord,
     duplicateRows,
+    transposeRows,
   };
 }
