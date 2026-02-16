@@ -1,25 +1,20 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ChordGrid } from '@/components/ChordGrid';
 import { ChordKeyboard } from '@/components/ChordKeyboard';
 import { useChordGrid } from '@/hooks/useChordGrid';
 import { useSongStorage } from '@/hooks/useSongStorage';
+import { shareService } from '@/services/shareService';
 import { toast } from 'sonner';
-import { ChevronUp, ChevronDown, Keyboard, Eye, Star, Save } from 'lucide-react';
+import { ChevronUp, ChevronDown, Keyboard, Eye, Star, Save, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-interface SharedSongData {
-  title: string;
-  rows: any[];
-  owner: string;
-}
-
 const SharedView = () => {
-  const [searchParams] = useSearchParams();
+  const { shareId } = useParams<{ shareId: string }>();
   const navigate = useNavigate();
-  const [sharedData, setSharedData] = useState<SharedSongData | null>(null);
-  const [isReadOnly, setIsReadOnly] = useState(true);
+  const [sharedData, setSharedData] = useState<{ title: string; owner: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [keyboardOpen, setKeyboardOpen] = useState(true);
   
   const {
@@ -44,23 +39,38 @@ const SharedView = () => {
     saveSong,
   } = useSongStorage();
 
-  // Parse shared data from URL
+  // Fetch shared data from backend
   useEffect(() => {
-    const dataParam = searchParams.get('data');
-    if (dataParam) {
-      try {
-        const decoded = decodeURIComponent(atob(dataParam));
-        const parsed = JSON.parse(decoded) as SharedSongData;
-        setSharedData(parsed);
-        setRows(parsed.rows);
-      } catch (error) {
-        toast.error('Link tidak valid');
+    const fetchSharedSong = async () => {
+      if (!shareId) {
         navigate('/');
+        return;
       }
-    } else {
-      navigate('/');
-    }
-  }, [searchParams, navigate, setRows]);
+
+      try {
+        const response = await shareService.getSharedSong(shareId);
+        
+        if (response.success && response.song) {
+          setSharedData({
+            title: response.song.title,
+            owner: response.song.owner,
+          });
+          setRows(response.song.rows);
+        } else {
+          toast.error('Lagu tidak ditemukan');
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('Error fetching shared song:', error);
+        toast.error('Gagal memuat lagu');
+        navigate('/');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSharedSong();
+  }, [shareId, navigate, setRows]);
 
   const handleToggleBookmark = () => {
     if (sharedData) {
@@ -75,6 +85,17 @@ const SharedView = () => {
       toast.success('Lagu disimpan ke library!');
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Memuat lagu...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!sharedData) {
     return null;

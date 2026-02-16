@@ -32,7 +32,7 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               
               {/* Shared Song View - Public */}
-              <Route path="/shared" element={<SharedView />} />
+              <Route path="/shared/:shareId" element={<SharedView />} />
 
               {/* Protected Routes */}
               <Route

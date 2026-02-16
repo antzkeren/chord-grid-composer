@@ -8,6 +8,8 @@ import { ScrollArea } from './ui/scroll-area';
 import { Song } from '@/types/song';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { shareService } from '@/services/shareService';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SongLibraryProps {
   isOpen: boolean;
@@ -43,6 +45,8 @@ export function SongLibrary({
   const [songToShare, setSongToShare] = useState<Song | null>(null);
   const [shareUrl, setShareUrl] = useState('');
   const [copied, setCopied] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const { user } = useAuth();
 
   const displayedSongs = filteredSongs(activeTab === 'bookmarks');
 
@@ -59,19 +63,25 @@ export function SongLibrary({
     onClose();
   };
 
-  const handleShare = (song: Song) => {
-    // Encode song data as base64 URL parameter
-    const songData = {
-      title: song.title,
-      rows: song.rows,
-      owner: song.owner || 'Unknown',
-    };
-    const encoded = btoa(encodeURIComponent(JSON.stringify(songData)));
-    const url = `${window.location.origin}/shared?data=${encoded}`;
-    setShareUrl(url);
-    setSongToShare(song);
-    setShareDialogOpen(true);
-    setCopied(false);
+  const handleShare = async (song: Song) => {
+    setIsSharing(true);
+    try {
+      const response = await shareService.shareSong({
+        title: song.title,
+        rows: song.rows,
+        owner_name: song.owner || user?.name || 'Unknown',
+      });
+      
+      setShareUrl(response.url);
+      setSongToShare(song);
+      setShareDialogOpen(true);
+      setCopied(false);
+    } catch (error) {
+      console.error('Error sharing song:', error);
+      toast.error('Gagal membagikan lagu');
+    } finally {
+      setIsSharing(false);
+    }
   };
 
   const handleCopyLink = async () => {

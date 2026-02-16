@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SongController;
 use App\Http\Controllers\Api\ChordController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ShareController;
 
 // Public Auth Routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -29,3 +30,7 @@ Route::apiResource('chords', ChordController::class);
 Route::post('chord-rows', [ChordController::class, 'storeChordRow']);
 Route::patch('chord-rows/{chordRow}', [ChordController::class, 'updateChordRow']);
 Route::delete('chord-rows/{chordRow}', [ChordController::class, 'deleteChordRow']);
+
+// Share API (public)
+Route::post('/share', [ShareController::class, 'store']);
+Route::get('/share/{shareId}', [ShareController::class, 'show']);
