@@ -184,9 +184,9 @@ const Index = () => {
         </Button>
       </div>
 
-      {/* Collapsible Keyboard */}
+      {/* Collapsible Keyboard - Mobile Only */}
       <div className={cn(
-        "transition-all duration-300 ease-in-out",
+        "md:hidden transition-all duration-300 ease-in-out",
         keyboardOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
       )}>
         <ChordKeyboard
