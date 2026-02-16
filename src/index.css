@@ -132,7 +132,10 @@
     @apply relative flex flex-col items-center justify-center 
            bg-[hsl(var(--chord-bg))] border border-[hsl(var(--grid-line))]
            rounded-md transition-all duration-150 cursor-pointer
-           hover:bg-[hsl(var(--chord-hover))] hover:border-[hsl(var(--chord-active))];
+           hover:bg-[hsl(var(--chord-hover))] hover:border-[hsl(var(--chord-active))]
+           min-h-[48px] sm:min-h-[56px] md:min-h-[64px] p-1;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .chord-cell.active {
@@ -145,15 +148,15 @@
   }
 
   .chord-text {
-    @apply font-mono font-semibold text-lg text-foreground;
+    @apply font-mono font-semibold text-xs sm:text-sm md:text-lg text-foreground;
   }
 
   .beat-indicator {
-    @apply absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5;
+    @apply absolute bottom-0.5 left-1/2 -translate-x-1/2 flex gap-0.5;
   }
 
   .beat-dot {
-    @apply w-1.5 h-1.5 rounded-full;
+    @apply w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full;
   }
 
   .beat-dot.beat-1 { @apply bg-[hsl(var(--beat-1))]; }
@@ -162,11 +165,12 @@
   .beat-dot.beat-4 { @apply bg-[hsl(var(--beat-4))]; }
 
   .chord-button {
-    @apply flex items-center justify-center px-3 py-2 
+    @apply flex items-center justify-center px-2 py-1.5 sm:px-3 sm:py-2 
            bg-secondary text-secondary-foreground font-mono font-medium
-           rounded-lg border border-border
+           rounded-lg border border-border text-xs sm:text-sm
            hover:bg-[hsl(var(--chord-hover))] hover:border-[hsl(var(--chord-active))]
-           active:scale-95 transition-all duration-100;
+           active:scale-95 transition-all duration-100
+           min-h-[40px] touch-manipulation;
   }
 
   .chord-button.primary-chord {
@@ -178,9 +182,10 @@
   }
 
   .key-button {
-    @apply px-4 py-2 rounded-lg font-semibold transition-all duration-150
-           bg-secondary text-secondary-foreground border border-border
-           hover:bg-[hsl(var(--chord-hover))] hover:border-primary;
+    @apply px-2 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-all duration-150
+           bg-secondary text-secondary-foreground border border-border text-xs sm:text-sm
+           hover:bg-[hsl(var(--chord-hover))] hover:border-primary
+           min-h-[40px] touch-manipulation;
   }
 
   .key-button.active {

@@ -69,10 +69,10 @@ export default function Register() {
 
   if (!GOOGLE_CLIENT_ID) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
-        <Card className="w-full max-w-md">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-sm sm:max-w-md">
           <CardContent className="pt-6">
-            <div className="text-center text-destructive">
+            <div className="text-center text-destructive text-sm sm:text-base">
               Google OAuth Client ID belum dikonfigurasi. Silakan hubungi administrator.
             </div>
           </CardContent>
@@ -82,15 +82,15 @@ export default function Register() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Daftar Akun</CardTitle>
-          <CardDescription>
+    <div className="flex min-h-screen items-center justify-center bg-background p-3 sm:p-4">
+      <Card className="w-full max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <CardHeader className="space-y-1 px-3 sm:px-6">
+          <CardTitle className="text-xl sm:text-2xl font-bold text-center">Daftar Akun</CardTitle>
+          <CardDescription className="text-xs sm:text-sm text-center">
             Buat akun baru untuk memulai
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-3 sm:px-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Nama Lengkap</Label>
@@ -157,7 +157,11 @@ export default function Register() {
                 minLength={8}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              className="w-full h-10 sm:h-11" 
+              disabled={isLoading}
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -169,7 +173,7 @@ export default function Register() {
             </Button>
           </form>
 
-          <div className="relative my-4">
+          <div className="relative my-3 sm:my-4">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
@@ -180,7 +184,7 @@ export default function Register() {
             </div>
           </div>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center scale-90 sm:scale-100">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => toast.error('Daftar dengan Google gagal')}

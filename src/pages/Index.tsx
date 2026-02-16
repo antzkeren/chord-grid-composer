@@ -7,6 +7,9 @@ import { useChordGrid } from '@/hooks/useChordGrid';
 import { useSongStorage } from '@/hooks/useSongStorage';
 import { Song } from '@/types/song';
 import { toast } from 'sonner';
+import { ChevronUp, ChevronDown, Keyboard } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const Index = () => {
   const {
@@ -55,6 +58,7 @@ const Index = () => {
   const [currentSongId, setCurrentSongId] = useState<string | undefined>();
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [keyboardOpen, setKeyboardOpen] = useState(true);
 
   // Store initial state to track unsaved changes
   const initialStateRef = useRef({ rows, songTitle, currentSongId });
@@ -165,18 +169,55 @@ const Index = () => {
         onRemoveNote={removeNote}
       />
 
-      <ChordKeyboard
-        selectedKey={selectedKey}
-        onKeyChange={setSelectedKey}
-        onChordSelect={selectChord}
-        onBeatChange={updateCellBeats}
-        onClear={clearCell}
-        onAddBass={addBassNote}
-        currentCellBeats={getSelectedCellData()?.beats || 4}
-        currentChord={getSelectedCellData()?.chord || null}
-        customChords={customChords[selectedKey.key] || []}
-        onRemoveCustomChord={removeCustomChord}
-      />
+      {/* Mobile Keyboard Toggle */}
+      <div className="md:hidden border-t border-border">
+        <Button
+          variant="ghost"
+          className="w-full flex items-center justify-between px-4 py-2 h-auto"
+          onClick={() => setKeyboardOpen(!keyboardOpen)}
+        >
+          <div className="flex items-center gap-2">
+            <Keyboard size={16} className="text-muted-foreground" />
+            <span className="text-sm font-medium">Piano Keyboard</span>
+          </div>
+          {keyboardOpen ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+        </Button>
+      </div>
+
+      {/* Collapsible Keyboard */}
+      <div className={cn(
+        "transition-all duration-300 ease-in-out",
+        keyboardOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+      )}>
+        <ChordKeyboard
+          selectedKey={selectedKey}
+          onKeyChange={setSelectedKey}
+          onChordSelect={selectChord}
+          onBeatChange={updateCellBeats}
+          onClear={clearCell}
+          onAddBass={addBassNote}
+          currentCellBeats={getSelectedCellData()?.beats || 4}
+          currentChord={getSelectedCellData()?.chord || null}
+          customChords={customChords[selectedKey.key] || []}
+          onRemoveCustomChord={removeCustomChord}
+        />
+      </div>
+
+      {/* Desktop Keyboard - Always visible */}
+      <div className="hidden md:block">
+        <ChordKeyboard
+          selectedKey={selectedKey}
+          onKeyChange={setSelectedKey}
+          onChordSelect={selectChord}
+          onBeatChange={updateCellBeats}
+          onClear={clearCell}
+          onAddBass={addBassNote}
+          currentCellBeats={getSelectedCellData()?.beats || 4}
+          currentChord={getSelectedCellData()?.chord || null}
+          customChords={customChords[selectedKey.key] || []}
+          onRemoveCustomChord={removeCustomChord}
+        />
+      </div>
 
       <SongLibrary
         isOpen={libraryOpen}

@@ -33,9 +33,9 @@ export function ChordKeyboard({
   const [activeTab, setActiveTab] = useState<TabType>('chords');
 
   return (
-    <div className="bg-card border-t border-border p-4 space-y-3">
+    <div className="bg-card border-t border-border p-2 sm:p-4 space-y-2 sm:space-y-3">
       {/* Tabs */}
-      <div className="flex border-b bg-secondary/30 rounded-t-lg overflow-x-auto scrollbar-thin">
+      <div className="flex border-b bg-secondary/30 rounded-t-lg overflow-x-auto scrollbar-thin -mx-2 px-2 sm:mx-0 sm:px-0">
         <button
           onClick={() => setActiveTab('chords')}
           className={cn(
@@ -85,9 +85,9 @@ export function ChordKeyboard({
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-[100px]">
+      <div className="min-h-[100px] overflow-y-auto">
         {activeTab === 'chords' && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start">
             {/* Standard chord family */}
             {selectedKey.chords.map((chord) => (
               <button
@@ -129,7 +129,7 @@ export function ChordKeyboard({
 
         {activeTab === 'key' && (
           <div className="space-y-2">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center sm:justify-start">
               {KEY_FAMILIES.map((keyFamily) => (
                 <button
                   key={keyFamily.key}
@@ -147,7 +147,7 @@ export function ChordKeyboard({
         )}
 
         {activeTab === 'modifier' && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start">
             {EXTRA_CHORDS.map((mod) => (
               <button
                 key={mod}
@@ -161,7 +161,7 @@ export function ChordKeyboard({
         )}
 
         {activeTab === 'bass' && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start">
             {BASS_NOTES.map((bass) => (
               <button
                 key={bass}
@@ -177,36 +177,38 @@ export function ChordKeyboard({
       </div>
 
       {/* Beat Selector & Actions */}
-      <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-border">
+      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 pt-2 border-t border-border">
         {/* Beat Selector - Changes current cell's beats */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Ketuk:</span>
-          {[1, 2, 3, 4].map((beat) => (
-            <button
-              key={beat}
-              onClick={() => onBeatChange(beat)}
-              className={cn(
-                'w-8 h-8 rounded-lg font-mono font-semibold transition-all',
-                currentCellBeats === beat
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-secondary text-secondary-foreground hover:bg-[hsl(var(--chord-hover))]'
-              )}
-            >
-              {beat}
-            </button>
-          ))}
+        <div className="flex items-center gap-1 sm:gap-2">
+          <span className="text-xs sm:text-sm text-muted-foreground">Ketuk:</span>
+          <div className="flex gap-1">
+            {[1, 2, 3, 4].map((beat) => (
+              <button
+                key={beat}
+                onClick={() => onBeatChange(beat)}
+                className={cn(
+                  'w-8 h-8 sm:w-8 sm:h-8 rounded-lg font-mono font-semibold text-sm transition-all',
+                  currentCellBeats === beat
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-[hsl(var(--chord-hover))]'
+                )}
+              >
+                {beat}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="flex-1" />
+        <div className="flex-1 hidden sm:block" />
 
         {/* Action Buttons */}
         <button
           onClick={onClear}
-          className="toolbar-button flex items-center gap-2 px-3 hover:bg-destructive/20 hover:text-destructive"
+          className="toolbar-button flex items-center gap-1 sm:gap-2 px-2 sm:px-3 hover:bg-destructive/20 hover:text-destructive"
           title="Hapus chord"
         >
-          <Trash size={16} />
-          <span className="text-sm">Clear</span>
+          <Trash size={14} className="sm:w-4 sm:h-4" />
+          <span className="text-xs sm:text-sm hidden xs:inline">Clear</span>
         </button>
       </div>
     </div>

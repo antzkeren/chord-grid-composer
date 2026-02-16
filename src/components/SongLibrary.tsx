@@ -56,9 +56,9 @@ export function SongLibrary({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      <DialogContent className="max-w-lg max-h-[85vh] sm:max-h-[80vh] flex flex-col w-[95vw] sm:w-full">
+        <DialogHeader className="px-1 sm:px-0">
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <FolderOpen className="h-5 w-5" />
             Library Lagu
           </DialogTitle>
@@ -67,11 +67,12 @@ export function SongLibrary({
         {/* Save current song button */}
         <Button 
           onClick={onSaveCurrent} 
-          className="w-full mb-4"
+          className="w-full text-sm"
+          size="sm"
           variant="outline"
         >
           <Save className="h-4 w-4 mr-2" />
-          Simpan "{currentSongTitle || 'Untitled'}"
+          <span className="truncate">{currentSongTitle || 'Untitled'}</span>
         </Button>
 
         {/* Search */}
@@ -87,18 +88,18 @@ export function SongLibrary({
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'all' | 'bookmarks')}>
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="all">
+          <TabsList className="grid w-full grid-cols-2 mb-3 sm:mb-4">
+            <TabsTrigger value="all" className="text-xs sm:text-sm">
               Semua ({songs.length})
             </TabsTrigger>
-            <TabsTrigger value="bookmarks">
-              <Star className="h-4 w-4 mr-1" />
-              Bookmark ({bookmarks.length})
+            <TabsTrigger value="bookmarks" className="text-xs sm:text-sm">
+              <Star className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden xs:inline">Bookmark</span> ({bookmarks.length})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value={activeTab} className="mt-0">
-            <ScrollArea className="h-[300px] pr-4">
+            <ScrollArea className="h-[250px] sm:h-[300px] pr-2 sm:pr-4">
               {displayedSongs.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   {activeTab === 'bookmarks' 
