@@ -132,6 +132,8 @@ export default function Login() {
             </Button>
           </form>
 
+          {/* Google Login - Disabled due to OAuth configuration issues */}
+          {/*
           <div className="relative my-3 sm:my-4">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -155,6 +157,7 @@ export default function Login() {
               clientId={GOOGLE_CLIENT_ID}
             />
           </div>
+          */}
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
