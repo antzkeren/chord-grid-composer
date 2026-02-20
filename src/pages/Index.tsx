@@ -59,27 +59,34 @@ const Index = () => {
 
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [currentSongId, setCurrentSongId] = useState<string | undefined>();
+  const [visibility, setVisibility] = useState<'public' | 'unlisted' | 'private'>('private');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [keyboardOpen, setKeyboardOpen] = useState(true);
 
   // Store initial state to track unsaved changes
-  const initialStateRef = useRef({ rows, songTitle, currentSongId });
+  const initialStateRef = useRef({ rows, songTitle, currentSongId, visibility });
 
   // Check for unsaved changes
   useEffect(() => {
     const isDifferent = (
       JSON.stringify(rows) !== JSON.stringify(initialStateRef.current.rows) ||
       songTitle !== initialStateRef.current.songTitle ||
-      currentSongId !== initialStateRef.current.currentSongId
+      currentSongId !== initialStateRef.current.currentSongId ||
+      visibility !== initialStateRef.current.visibility
     );
     setHasUnsavedChanges(isDifferent);
-  }, [rows, songTitle, currentSongId]);
+  }, [rows, songTitle, currentSongId, visibility]);
 
   const handleSaveSong = () => {
-    saveSong(songTitle, rows, currentSongId, user?.name);
+    saveSong(songTitle, rows, currentSongId, user?.name, visibility);
     // Update initial state after saving
-    initialStateRef.current = { rows: JSON.parse(JSON.stringify(rows)), songTitle, currentSongId };
+    initialStateRef.current = {
+      rows: JSON.parse(JSON.stringify(rows)),
+      songTitle,
+      currentSongId,
+      visibility,
+    };
     toast.success(currentSongId ? 'Lagu diupdate!' : 'Lagu tersimpan!');
   };
 
@@ -113,7 +120,8 @@ const Index = () => {
     setRows(emptyRows);
     setSongTitle('');
     setCurrentSongId(undefined);
-    initialStateRef.current = { rows: JSON.parse(JSON.stringify(emptyRows)), songTitle: '', currentSongId: undefined };
+    setVisibility('private');
+    initialStateRef.current = { rows: JSON.parse(JSON.stringify(emptyRows)), songTitle: '', currentSongId: undefined, visibility: 'private' };
     toast.info('Chart baru dibuat');
   };
 
@@ -126,8 +134,14 @@ const Index = () => {
     setRows(song.rows);
     setSongTitle(song.title);
     setCurrentSongId(song.id);
+    setVisibility(song.visibility || 'private');
     setSelectedCell(null);
-    initialStateRef.current = { rows: JSON.parse(JSON.stringify(song.rows)), songTitle: song.title, currentSongId: song.id };
+    initialStateRef.current = {
+      rows: JSON.parse(JSON.stringify(song.rows)),
+      songTitle: song.title,
+      currentSongId: song.id,
+      visibility: song.visibility || 'private',
+    };
     toast.success(`"${song.title}" dimuat`);
   };
 
@@ -140,6 +154,8 @@ const Index = () => {
         onNew={handleNew}
         onOpenLibrary={() => setLibraryOpen(true)}
         hasUnsavedChanges={hasUnsavedChanges}
+        visibility={visibility}
+        onVisibilityChange={setVisibility}
       />
 
       <ChordGrid
@@ -157,12 +173,12 @@ const Index = () => {
         onDuplicateRows={(rowIds) => {
           duplicateRows(rowIds);
           setSelectedRows([]);
-          toast.success(`${rowIds.length} baris diduplikasi`);
+          toast.success(`${rowIds.length} rows duplicated`);
         }}
         onTransposeRows={(rowIds, semitones) => {
           transposeRows(rowIds, semitones);
           setSelectedRows([]);
-          toast.success(`${rowIds.length} baris di-transpose ${semitones > 0 ? '+' : ''}${semitones} semitone`);
+          toast.success(`${rowIds.length} rows transposed ${semitones > 0 ? '+' : ''}${semitones} semitone`);
         }}
         onReorderRows={(newRows) => {
           setRows(newRows);
@@ -239,7 +255,6 @@ const Index = () => {
         onToggleBookmark={toggleBookmark}
         filteredSongs={filteredSongs}
         currentSongTitle={songTitle}
-        onSaveCurrent={handleSaveSong}
       />
     </div>
   );

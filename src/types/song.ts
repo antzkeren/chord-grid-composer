@@ -6,8 +6,10 @@ export interface Song {
   rows: ChordRow[];
   createdAt: string;
   updatedAt: string;
-  isBookmarked: boolean;
-  owner?: string; // For shared songs
+  visibility?: 'public' | 'unlisted' | 'private';
+  owner?: { id: number; name: string } | string; // owner may be name or object from API
+  bookmark_count?: number;
+  isBookmarked?: boolean; // local fallback
 }
 
 export interface SongLibrary {

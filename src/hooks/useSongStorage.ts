@@ -33,33 +33,43 @@ export function useSongStorage() {
     saveLibrary(library);
   }, [library]);
 
-  const saveSong = useCallback((title: string, rows: ChordRow[], existingId?: string, owner?: string) => {
-    const now = new Date().toISOString();
-    
-    setLibrary(prev => {
-      if (existingId) {
-        // Update existing song
-        const updatedSongs = prev.songs.map(song =>
-          song.id === existingId
-            ? { ...song, title, rows, updatedAt: now }
-            : song
-        );
-        return { ...prev, songs: updatedSongs };
-      } else {
-        // Create new song
-        const newSong: Song = {
-          id: generateSongId(),
-          title: title || 'Untitled',
-          rows,
-          createdAt: now,
-          updatedAt: now,
-          isBookmarked: false,
-          owner,
-        };
-        return { ...prev, songs: [newSong, ...prev.songs] };
-      }
-    });
-  }, []);
+  const saveSong = useCallback(
+    (
+      title: string,
+      rows: ChordRow[],
+      existingId?: string,
+      owner?: string,
+      visibility: 'public' | 'unlisted' | 'private' = 'private'
+    ) => {
+      const now = new Date().toISOString();
+
+      setLibrary(prev => {
+        if (existingId) {
+          // Update existing song
+          const updatedSongs = prev.songs.map(song =>
+            song.id === existingId
+              ? { ...song, title, rows, updatedAt: now, visibility }
+              : song
+          );
+          return { ...prev, songs: updatedSongs };
+        } else {
+          // Create new song
+          const newSong: Song = {
+            id: generateSongId(),
+            title: title || 'Untitled',
+            rows,
+            createdAt: now,
+            updatedAt: now,
+            visibility,
+            isBookmarked: false,
+            owner,
+          };
+          return { ...prev, songs: [newSong, ...prev.songs] };
+        }
+      });
+    },
+    []
+  );
 
   const deleteSong = useCallback((songId: string) => {
     setLibrary(prev => ({

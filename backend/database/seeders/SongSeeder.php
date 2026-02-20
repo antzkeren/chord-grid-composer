@@ -15,13 +15,21 @@ class SongSeeder extends Seeder
      */
     public function run(): void
     {
+        // create a user to own the sample data (plain creation avoids factory issues)
+        $user = \App\Models\User::create([
+            'name' => 'Seed User',
+            'email' => 'seed@local.test',
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+        ]);
+
         // Sample Song 1
         $song1 = Song::create([
             'title' => 'Let It Be',
             'artist' => 'The Beatles',
             'key' => 'C',
             'notes' => 'Classic Beatles song',
-            'is_bookmarked' => true,
+            'user_id' => $user->id,
+            'visibility' => 'public',
         ]);
 
         // Add chords for song 1
@@ -46,7 +54,7 @@ class SongSeeder extends Seeder
             'chord_name' => 'G Major',
         ]);
 
-        // Add chord rows for song 1
+        // Add chord rows for song1
         ChordRow::create([
             'song_id' => $song1->id,
             'row_index' => 0,
@@ -58,13 +66,17 @@ class SongSeeder extends Seeder
             'chords' => ['C', 'Am', 'F', 'G'],
         ]);
 
+        // mark song1 and song3 as bookmarked by the seeder user
+        $user->bookmarks()->attach([$song1->id, ]);
+
         // Sample Song 2
         $song2 = Song::create([
             'title' => 'Imagine',
             'artist' => 'John Lennon',
             'key' => 'C',
             'notes' => 'Peaceful and inspiring',
-            'is_bookmarked' => false,
+            'user_id' => $user->id,
+            'visibility' => 'public',
         ]);
 
         // Add chords for song 2
@@ -102,8 +114,12 @@ class SongSeeder extends Seeder
             'artist' => 'Oasis',
             'key' => 'Em7',
             'notes' => null,
-            'is_bookmarked' => true,
+            'user_id' => $user->id,
+            'visibility' => 'public',
         ]);
+
+        // add a bookmark for song3 as well
+        $user->bookmarks()->attach($song3->id);
 
         // Add chords for song 3
         Chord::create([

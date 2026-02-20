@@ -57,12 +57,12 @@ const SharedView = () => {
           });
           setRows(response.song.rows);
         } else {
-          toast.error('Lagu tidak ditemukan');
+          toast.error('Song not found');
           navigate('/');
         }
       } catch (error) {
         console.error('Error fetching shared song:', error);
-        toast.error('Gagal memuat lagu');
+        toast.error('Failed to load song');
         navigate('/');
       } finally {
         setIsLoading(false);
@@ -75,14 +75,15 @@ const SharedView = () => {
   const handleToggleBookmark = () => {
     if (sharedData) {
       toggleBookmark(sharedData.title);
-      toast.success(bookmarks.includes(sharedData.title) ? 'Dihapus dari bookmark' : 'Ditambahkan ke bookmark');
+      toast.success(bookmarks.includes(sharedData.title) ? 'Removed from bookmarks' : 'Added to bookmarks');
     }
   };
 
   const handleSaveToLibrary = () => {
     if (sharedData) {
-      saveSong(sharedData.title, rows);
-      toast.success('Lagu disimpan ke library!');
+      // when saving a shared song we'll treat it as a private copy
+      saveSong(sharedData.title, rows, undefined, undefined, 'private');
+      toast.success('Song saved to library!');
     }
   };
 
@@ -91,7 +92,7 @@ const SharedView = () => {
       <div className="h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Memuat lagu...</p>
+          <p className="text-muted-foreground">Loading song...</p>
         </div>
       </div>
     );
@@ -131,7 +132,7 @@ const SharedView = () => {
               size="sm"
             >
               <Save size={16} className="mr-2" />
-              Simpan
+              Save
             </Button>
           </div>
         </div>

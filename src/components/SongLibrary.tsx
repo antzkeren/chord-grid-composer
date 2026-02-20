@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Star, Trash2, FolderOpen, Save, Share2, Link as LinkIcon, Check, Eye } from 'lucide-react';
+import { Search, Star, Trash2, FolderOpen, Share2, Link as LinkIcon, Check, Eye } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
@@ -23,7 +23,6 @@ interface SongLibraryProps {
   onToggleBookmark: (songId: string) => void;
   filteredSongs: (bookmarksOnly: boolean) => Song[];
   currentSongTitle: string;
-  onSaveCurrent: () => void;
 }
 
 export function SongLibrary({
@@ -38,9 +37,8 @@ export function SongLibrary({
   onToggleBookmark,
   filteredSongs,
   currentSongTitle,
-  onSaveCurrent,
 }: SongLibraryProps) {
-  const [activeTab, setActiveTab] = useState<'all' | 'bookmarks'>('all');
+  const [activeTab, setActiveTab] = useState<'public' | 'yours' | 'bookmarks'>('public');
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [songToShare, setSongToShare] = useState<Song | null>(null);
   const [shareUrl, setShareUrl] = useState('');
@@ -48,7 +46,31 @@ export function SongLibrary({
   const [isSharing, setIsSharing] = useState(false);
   const { user } = useAuth();
 
-  const displayedSongs = filteredSongs(activeTab === 'bookmarks');
+  const displayedSongs = (() => {
+    let list: Song[];
+    switch (activeTab) {
+      case 'public':
+        list = songs.filter((s) => s.visibility === 'public');
+        break;
+      case 'yours':
+        list = songs.filter((s) => {
+          if (!user) return false;
+          if (typeof s.owner === 'object') return s.owner.id === user.id;
+          return s.owner === user.name;
+        });
+        break;
+      case 'bookmarks':
+        list = filteredSongs(true);
+        break;
+      default:
+        list = songs;
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter((s) => s.title?.toLowerCase().includes(q));
+    }
+    return list;
+  })();
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('id-ID', {
@@ -72,13 +94,15 @@ export function SongLibrary({
         owner_name: song.owner || user?.name || 'Unknown',
       });
       
-      setShareUrl(response.url);
+      // backend may return its own base url (localhost:8000); use frontend origin instead
+      const link = `${window.location.origin}/shared/${response.share_id}`;
+      setShareUrl(link);
       setSongToShare(song);
       setShareDialogOpen(true);
       setCopied(false);
     } catch (error) {
       console.error('Error sharing song:', error);
-      toast.error('Gagal membagikan lagu');
+      toast.error('Failed to share song');
     } finally {
       setIsSharing(false);
     }
@@ -88,9 +112,9 @@ export function SongLibrary({
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
-      toast.success('Link berhasil disalin!');
+      toast.success('Link copied to clipboard!');
     } catch {
-      toast.error('Gagal menyalin link');
+      toast.error('Failed to copy link');
     }
   };
 
@@ -101,20 +125,9 @@ export function SongLibrary({
           <DialogHeader className="px-1 sm:px-0">
             <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <FolderOpen className="h-5 w-5" />
-              Library Lagu
+              Song Library
             </DialogTitle>
           </DialogHeader>
-
-          {/* Save current song button */}
-          <Button 
-            onClick={onSaveCurrent} 
-            className="w-full text-sm"
-            size="sm"
-            variant="outline"
-          >
-            <Save className="h-4 w-4 mr-2" />
-            <span className="truncate">{currentSongTitle || 'Untitled'}</span>
-          </Button>
 
           {/* Search */}
           <div className="relative mb-4">
@@ -122,16 +135,23 @@ export function SongLibrary({
             <Input
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Cari lagu..."
+              placeholder="Search songs..."
               className="pl-10"
             />
           </div>
 
           {/* Tabs */}
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'all' | 'bookmarks')}>
-            <TabsList className="grid w-full grid-cols-2 mb-3 sm:mb-4">
-              <TabsTrigger value="all" className="text-xs sm:text-sm">
-                Semua ({songs.length})
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'public' | 'yours' | 'bookmarks')}>
+            <TabsList className="grid w-full grid-cols-3 mb-3 sm:mb-4">
+              <TabsTrigger value="public" className="text-xs sm:text-sm">
+                Public ({songs.filter(s=>s.visibility==='public').length})
+              </TabsTrigger>
+              <TabsTrigger value="yours" className="text-xs sm:text-sm">
+                Your Songs ({songs.filter(s=>{
+                  if (!user) return false;
+                  if (typeof s.owner === 'object') return s.owner.id === user.id;
+                  return s.owner === user.name;
+                }).length})
               </TabsTrigger>
               <TabsTrigger value="bookmarks" className="text-xs sm:text-sm">
                 <Star className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
@@ -144,10 +164,10 @@ export function SongLibrary({
                 {displayedSongs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     {activeTab === 'bookmarks' 
-                      ? 'Belum ada lagu di bookmark' 
+                      ? 'No songs bookmarked yet' 
                       : searchQuery 
-                        ? 'Tidak ada lagu ditemukan'
-                        : 'Belum ada lagu tersimpan'}
+                        ? 'No songs found'
+                        : 'No saved songs'}
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -177,22 +197,27 @@ export function SongLibrary({
                           <div className="font-medium truncate">
                             {song.title || 'Untitled'}
                           </div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="text-xs text-muted-foreground flex flex-col">
                             {formatDate(song.updatedAt)}
+                            {activeTab === 'public' && song.owner ? (
+                              <span className="text-xs italic">
+                                by {typeof song.owner === 'object' ? song.owner.name : song.owner}
+                              </span>
+                            ) : null}
                           </div>
                         </button>
 
                         <button
                           onClick={() => handleShare(song)}
                           className="shrink-0 text-muted-foreground hover:text-primary transition-colors"
-                          title="Bagikan"
+                          title="Share"
                         >
                           <Share2 className="h-4 w-4" />
                         </button>
 
                         <button
                           onClick={() => {
-                            if (confirm(`Hapus "${song.title}"?`)) {
+                            if (confirm(`Delete "${song.title}"?`)) {
                               onDeleteSong(song.id);
                             }
                           }}
@@ -208,10 +233,6 @@ export function SongLibrary({
             </TabsContent>
           </Tabs>
 
-          <p className="text-xs text-muted-foreground text-center mt-4">
-            Data tersimpan di browser (localStorage). 
-            Untuk sync antar device, perlu backend database.
-          </p>
         </DialogContent>
       </Dialog>
 
@@ -221,10 +242,10 @@ export function SongLibrary({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Share2 className="h-5 w-5" />
-              Bagikan Lagu
+              Share Song
             </DialogTitle>
             <DialogDescription>
-              Bagikan link ini kepada orang lain untuk melihat lagu "{songToShare?.title || 'Untitled'}"
+              Share this link with others so they can view "{songToShare?.title || 'Untitled'}"
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -240,12 +261,12 @@ export function SongLibrary({
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg">
               <Eye className="h-4 w-4 shrink-0" />
-              <span>Penerima hanya bisa melihat dan menyimpan ke bookmark</span>
+              <span>Recipient can only view and bookmark</span>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShareDialogOpen(false)}>
-              Tutup
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

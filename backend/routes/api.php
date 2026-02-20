@@ -20,8 +20,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-// Songs API (public for development)
-Route::apiResource('songs', SongController::class);
+// Songs API
+// list/show may be public (visibility rules applied in controller),
+// but creation, updates and special actions require authentication.
+Route::get('songs', [SongController::class, 'index']);
+Route::get('songs/{song}', [SongController::class, 'show']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('songs', [SongController::class, 'store']);
+    Route::patch('songs/{song}', [SongController::class, 'update']);
+    Route::delete('songs/{song}', [SongController::class, 'destroy']);
+
+    // bookmark toggling
+    Route::post('songs/{song}/bookmark', [SongController::class, 'bookmark']);
+
+    // duplicate/save-as
+    Route::post('songs/{song}/duplicate', [SongController::class, 'duplicate']);
+});
 
 // Chords API (public for development)
 Route::apiResource('chords', ChordController::class);

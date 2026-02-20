@@ -358,7 +358,7 @@ export function ChordGrid({
                 className="flex-1 border-dashed border-border hover:border-primary hover:bg-primary/10 text-xs sm:text-sm"
               >
                 <Plus size={14} className="mr-1 sm:mr-2" />
-                Tambah Baris
+                Add Row
               </Button>
             </div>
           </div>
@@ -371,7 +371,7 @@ export function ChordGrid({
           <DialogHeader>
             <DialogTitle>Transpose Chord</DialogTitle>
             <DialogDescription>
-              Pilih interval transpose untuk {selectedRows.length} baris yang dipilih
+              Select a transpose interval for {selectedRows.length} selected rows
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-4 gap-2 py-4">

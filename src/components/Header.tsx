@@ -1,4 +1,4 @@
-import { Music2, FolderOpen, LogOut, LogIn, Save, Sun, Moon, Monitor, Menu, X, Plus, ChevronDown } from 'lucide-react';
+import { Music2, FolderOpen, LogOut, LogIn, Save, Sun, Moon, Monitor, Menu, X, Plus, ChevronDown, Globe, Eye, Lock } from 'lucide-react';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
 import { Link, useNavigate } from 'react-router-dom';
@@ -28,9 +28,20 @@ interface HeaderProps {
   onNew: () => void;
   onOpenLibrary: () => void;
   hasUnsavedChanges?: boolean;
+  visibility: 'public' | 'unlisted' | 'private';
+  onVisibilityChange: (v: 'public' | 'unlisted' | 'private') => void;
 }
 
-export function Header({ songTitle, onTitleChange, onSave, onNew, onOpenLibrary, hasUnsavedChanges }: HeaderProps) {
+export function Header({
+  songTitle,
+  onTitleChange,
+  onSave,
+  onNew,
+  onOpenLibrary,
+  hasUnsavedChanges,
+  visibility,
+  onVisibilityChange,
+}: HeaderProps) {
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
@@ -59,19 +70,6 @@ export function Header({ songTitle, onTitleChange, onSave, onNew, onOpenLibrary,
               </SheetTitle>
             </SheetHeader>
             <div className="flex flex-col gap-4 mt-6">
-              {/* Mobile Title Input */}
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">Judul Lagu</label>
-                <input
-                  type="text"
-                  value={songTitle}
-                  onChange={(e) => onTitleChange(e.target.value)}
-                  placeholder="Judul Lagu..."
-                  className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm
-                           focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
               {/* Mobile Actions */}
               <div className="flex flex-col gap-2">
                 <Button
@@ -84,30 +82,6 @@ export function Header({ songTitle, onTitleChange, onSave, onNew, onOpenLibrary,
                 >
                   <FolderOpen size={16} className="mr-2" />
                   Library
-                </Button>
-                <Button
-                  onClick={() => {
-                    onSave();
-                    setMobileMenuOpen(false);
-                  }}
-                  className={cn(
-                    'w-full justify-start',
-                    hasUnsavedChanges && 'animate-pulse'
-                  )}
-                >
-                  <Save size={16} className="mr-2" />
-                  Simpan
-                </Button>
-                <Button
-                  onClick={() => {
-                    onNew();
-                    setMobileMenuOpen(false);
-                  }}
-                  variant="outline"
-                  className="w-full justify-start"
-                >
-                  <Plus size={16} className="mr-2" />
-                  Baru
                 </Button>
               </div>
 
@@ -191,13 +165,19 @@ export function Header({ songTitle, onTitleChange, onSave, onNew, onOpenLibrary,
                    focus:outline-none focus:ring-0 placeholder:text-muted-foreground"
         />
 
-        {/* Mobile: Compact title display */}
-        <div className="md:hidden flex-1 min-w-0">
-          <p className="font-semibold text-sm truncate">{songTitle || 'Lagu Baru'}</p>
-        </div>
+        {/* Mobile: Title Input */}
+        <input
+          type="text"
+          value={songTitle}
+          onChange={(e) => onTitleChange(e.target.value)}
+          placeholder="Judul Lagu..."
+          className="md:hidden flex-1 bg-transparent border-b border-border text-sm font-semibold
+                   focus:outline-none focus:ring-0 placeholder:text-muted-foreground px-2 py-1"
+        />
 
         {/* Desktop Actions - Hidden on mobile */}
         <div className="hidden md:flex items-center gap-2">
+          {/* Library button */}
           <Button
             onClick={onOpenLibrary}
             variant="outline"
@@ -206,6 +186,40 @@ export function Header({ songTitle, onTitleChange, onSave, onNew, onOpenLibrary,
             <FolderOpen size={16} />
             <span className="ml-2">Library</span>
           </Button>
+
+          {/* visibility dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="flex items-center gap-1">
+                {visibility === 'public'
+                  ? 'Public'
+                  : visibility === 'unlisted'
+                  ? 'Unlisted'
+                  : 'Private'}
+                <ChevronDown size={14} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-36">
+              <DropdownMenuItem
+                onClick={() => onVisibilityChange('public')}
+                className={visibility === 'public' ? 'bg-accent' : ''}
+              >
+                Public
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onVisibilityChange('unlisted')}
+                className={visibility === 'unlisted' ? 'bg-accent' : ''}
+              >
+                Unlisted
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onVisibilityChange('private')}
+                className={visibility === 'private' ? 'bg-accent' : ''}
+              >
+                Private
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             onClick={onSave}
             size="sm"
@@ -216,6 +230,14 @@ export function Header({ songTitle, onTitleChange, onSave, onNew, onOpenLibrary,
           >
             <Save size={16} className="mr-2" />
             Save
+          </Button>
+          <Button
+            onClick={onNew}
+            size="sm"
+            variant="outline"
+          >
+            <Plus size={16} className="mr-2" />
+            <span>New Song</span>
           </Button>
 
           {user ? (
@@ -272,17 +294,69 @@ export function Header({ songTitle, onTitleChange, onSave, onNew, onOpenLibrary,
           )}
         </div>
 
-        {/* Mobile: Quick Save Button */}
-        <Button
-          onClick={onSave}
-          size="icon"
-          className={cn(
-            'md:hidden flex-shrink-0',
-            hasUnsavedChanges && 'animate-pulse'
-          )}
-        >
-          <Save size={16} />
-        </Button>
+        {/* Mobile: Button Row */}
+        <div className="md:hidden flex items-center gap-1">
+          {/* mobile visibility icon */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-9 w-9 flex-shrink-0"
+                title={visibility === 'public' ? 'Public' : visibility === 'unlisted' ? 'Unlisted' : 'Private'}
+              >
+                {visibility === 'public' ? (
+                  <Globe size={18} />
+                ) : visibility === 'unlisted' ? (
+                  <Eye size={18} />
+                ) : (
+                  <Lock size={18} />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-36">
+              <DropdownMenuItem
+                onClick={() => onVisibilityChange('public')}
+                className={visibility === 'public' ? 'bg-accent' : ''}
+              >
+                <Globe size={16} className="mr-2" />
+                Public
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onVisibilityChange('unlisted')}
+                className={visibility === 'unlisted' ? 'bg-accent' : ''}
+              >
+                <Eye size={16} className="mr-2" />
+                Unlisted
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onVisibilityChange('private')}
+                className={visibility === 'private' ? 'bg-accent' : ''}
+              >
+                <Lock size={16} className="mr-2" />
+                Private
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button
+            onClick={onSave}
+            size="icon"
+            className={cn(
+              'h-9 w-9 flex-shrink-0',
+              hasUnsavedChanges && 'animate-pulse'
+            )}
+          >
+            <Save size={16} />
+          </Button>
+          <Button
+            onClick={onNew}
+            size="icon"
+            variant="outline"
+            className="h-9 w-9 flex-shrink-0"
+          >
+            <Plus size={16} />
+          </Button>
+        </div>
       </div>
     </header>
   );
