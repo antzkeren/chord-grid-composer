@@ -28,8 +28,8 @@ interface HeaderProps {
   onNew: () => void;
   onOpenLibrary: () => void;
   hasUnsavedChanges?: boolean;
-  visibility: 'public' | 'unlisted' | 'private';
-  onVisibilityChange: (v: 'public' | 'unlisted' | 'private') => void;
+  visibility: 'public' | 'private';
+  onVisibilityChange: (v: 'public' | 'private') => void;
 }
 
 export function Header({
@@ -191,11 +191,7 @@ export function Header({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="flex items-center gap-1">
-                {visibility === 'public'
-                  ? 'Public'
-                  : visibility === 'unlisted'
-                  ? 'Unlisted'
-                  : 'Private'}
+                {visibility === 'public' ? 'Public' : 'Private'}
                 <ChevronDown size={14} />
               </Button>
             </DropdownMenuTrigger>
@@ -205,12 +201,6 @@ export function Header({
                 className={visibility === 'public' ? 'bg-accent' : ''}
               >
                 Public
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onVisibilityChange('unlisted')}
-                className={visibility === 'unlisted' ? 'bg-accent' : ''}
-              >
-                Unlisted
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onVisibilityChange('private')}
@@ -304,12 +294,10 @@ export function Header({
                 size="icon"
                 variant="ghost"
                 className="h-9 w-9 flex-shrink-0"
-                title={visibility === 'public' ? 'Public' : visibility === 'unlisted' ? 'Unlisted' : 'Private'}
+                title={visibility === 'public' ? 'Public' : 'Private'}
               >
                 {visibility === 'public' ? (
                   <Globe size={18} />
-                ) : visibility === 'unlisted' ? (
-                  <Eye size={18} />
                 ) : (
                   <Lock size={18} />
                 )}
@@ -322,13 +310,6 @@ export function Header({
               >
                 <Globe size={16} className="mr-2" />
                 Public
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onVisibilityChange('unlisted')}
-                className={visibility === 'unlisted' ? 'bg-accent' : ''}
-              >
-                <Eye size={16} className="mr-2" />
-                Unlisted
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onVisibilityChange('private')}

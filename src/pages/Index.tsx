@@ -70,7 +70,7 @@ const Index = () => {
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [currentSongId, setCurrentSongId] = useState<string | undefined>();
   const [currentSongOwner, setCurrentSongOwner] = useState<string | undefined>();
-  const [visibility, setVisibility] = useState<'public' | 'unlisted' | 'private'>('private');
+  const [visibility, setVisibility] = useState<'public' | 'private'>('private');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
@@ -113,21 +113,20 @@ const Index = () => {
   const [keyboardOpen, setKeyboardOpen] = useState(true);
 
   // Store initial state to track unsaved changes
-  const initialStateRef = useRef({ rows, songTitle, currentSongId, visibility, tempo, timeSignature, baseChord });
+  const initialStateRef = useRef({ rows, songTitle, visibility, tempo, timeSignature, baseChord });
 
   // Check for unsaved changes
   useEffect(() => {
     const isDifferent = (
       JSON.stringify(rows) !== JSON.stringify(initialStateRef.current.rows) ||
       songTitle !== initialStateRef.current.songTitle ||
-      currentSongId !== initialStateRef.current.currentSongId ||
       visibility !== initialStateRef.current.visibility ||
       tempo !== initialStateRef.current.tempo ||
       timeSignature !== initialStateRef.current.timeSignature ||
       baseChord !== initialStateRef.current.baseChord
     );
     setHasUnsavedChanges(isDifferent);
-  }, [rows, songTitle, currentSongId, visibility, tempo, timeSignature, baseChord]);
+  }, [rows, songTitle, visibility, tempo, timeSignature, baseChord]);
 
   // Load song from URL params
   useEffect(() => {
@@ -160,7 +159,6 @@ const Index = () => {
       initialStateRef.current = {
         rows: JSON.parse(JSON.stringify(rows)),
         songTitle,
-        currentSongId: result?.id || currentSongId,
         visibility,
         tempo,
         timeSignature,
@@ -182,7 +180,6 @@ const Index = () => {
     initialStateRef.current = {
       rows: JSON.parse(JSON.stringify(rows)),
       songTitle,
-      currentSongId: result?.id || currentSongId,
       visibility,
       tempo,
       timeSignature,
@@ -229,7 +226,6 @@ const Index = () => {
     initialStateRef.current = {
       rows: JSON.parse(JSON.stringify(emptyRows)),
       songTitle: '',
-      currentSongId: undefined,
       visibility: 'private',
       tempo: 120,
       timeSignature: '4/4',
@@ -253,7 +249,7 @@ const Index = () => {
     setSongTitle(song.title);
     setCurrentSongId(song.id);
     setCurrentSongOwner(ownerName); // Track who owns this song
-    setVisibility(song.visibility || 'private');
+    setVisibility((song.visibility as 'public' | 'private') || 'private');
     setTempo(song.tempo ?? 120);
     setTimeSignature(song.timeSignature || '4/4');
     setBaseChord(song.baseChord || '');
@@ -261,8 +257,7 @@ const Index = () => {
     initialStateRef.current = {
       rows: JSON.parse(JSON.stringify(song.rows)),
       songTitle: song.title,
-      currentSongId: song.id,
-      visibility: song.visibility || 'private',
+      visibility: (song.visibility as 'public' | 'private') || 'private',
       tempo: song.tempo ?? 120,
       timeSignature: song.timeSignature || '4/4',
       baseChord: song.baseChord || '',

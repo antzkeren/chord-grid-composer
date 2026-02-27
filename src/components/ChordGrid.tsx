@@ -316,7 +316,7 @@ export function ChordGrid({
         >
           <div className="max-w-4xl mx-auto space-y-0 p-2 sm:p-4">
             {/* Metadata header - always visible and clickable */}
-            <div className="flex items-center gap-1.5 py-1 border-b border-border">
+            <div className="flex items-center gap-1.5 py-1">
               {/* placeholder for checkbox column when not in select mode */}
               {!onToggleAllRows && <div className="w-5" />}
               
@@ -338,17 +338,19 @@ export function ChordGrid({
                     )}
                   </button>
 
-                  {/* placeholder for row number column */}
-                  <div className="text-muted-foreground text-xs w-5 text-right font-mono">
-                    #
-                  </div>
-
-                  {/* empty space matching chord cells area */}
-                  <div className="flex-1 flex gap-1">
-                    <span className="text-xs text-muted-foreground italic">
-                      select all
+                  {/* Select All label - closer to checkbox */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleAllRows();
+                    }}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    title={allRowsSelected ? 'Deselect all rows' : 'Select all rows'}
+                  >
+                    <span className={allRowsSelected ? 'font-medium' : ''}>
+                      {allRowsSelected ? 'Selected' : 'Select all'}
                     </span>
-                  </div>
+                  </button>
                 </>
               )}
 
