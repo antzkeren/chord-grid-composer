@@ -295,6 +295,7 @@ export function Header({
         </div>
 
         {/* Mobile: Button Row */}
+
         <div className="md:hidden flex items-center gap-1">
           {/* mobile visibility icon */}
           <DropdownMenu>

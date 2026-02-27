@@ -32,7 +32,9 @@ export const KEY_FAMILIES: KeyFamily[] = [
   { key: 'Eb', doName: 'Do=Eb', chords: ['Eb', 'Fmin', 'Gmin', 'Ab', 'Bb', 'Cmin', 'Bb/D'] },
 ];
 
-export const EXTRA_CHORDS = ['min', 'maj', 'min7', 'maj7', 'sus4', 'min7b5', '7', 'sus2', 'add9', '6', 'dim7'];
+export const EXTRA_CHORDS = ['min', 'maj', 'min7', 'maj7', 'sus4', 'min7b5', '7', 'sus2', 'add9', '6', 'dim7', '9', '11', '13', 'maj9', 'maj13', 'add2', 'aug', 'dim'];
+
+export const CHROMATIC_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
 export const BASS_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B'];
 

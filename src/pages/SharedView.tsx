@@ -143,6 +143,8 @@ const SharedView = () => {
         rows={rows}
         selectedCell={selectedCell}
         selectedRows={[]}
+        allRowsSelected={false}
+        onToggleAllRows={() => {}}
         onCellSelect={(rowId, cellId) => setSelectedCell({ rowId, cellId })}
         onToggleRowSelect={() => {}}
         onDuplicateRows={() => {}}
@@ -167,7 +169,7 @@ const SharedView = () => {
         >
           <div className="flex items-center gap-2">
             <Keyboard size={16} className="text-muted-foreground" />
-            <span className="text-sm font-medium">Piano Keyboard</span>
+            <span className="text-sm font-medium">Chord Keyboard</span>
           </div>
           {keyboardOpen ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
         </Button>

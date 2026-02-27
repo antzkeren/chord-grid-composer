@@ -18,10 +18,17 @@ class Song extends Model
         'visibility',
         'user_id',
         'original_song_id',
+        // metadata
+        'tempo',
+        'time_signature',
+        'base_chord',
     ];
 
     protected $casts = [
         'visibility' => 'string',
+        'tempo' => 'integer',
+        'time_signature' => 'string',
+        'base_chord' => 'string',
     ];
 
     /**

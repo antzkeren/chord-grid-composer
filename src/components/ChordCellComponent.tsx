@@ -44,7 +44,6 @@ export function ChordCellComponent({ cell, isSelected, onClick, totalBeatsInRow 
         <>
           <span className={cn(
             'chord-text text-xs sm:text-base',
-            cell.chord?.includes('dim') && 'text-destructive',
             !cell.chord && 'text-muted-foreground/30'
           )}>
             {cell.chord || '—'}

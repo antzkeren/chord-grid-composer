@@ -33,6 +33,21 @@ interface ChordGridProps {
   rows: ChordRow[];
   selectedCell: { rowId: string; cellId: string } | null;
   selectedRows: string[];
+  /**
+   * optional master toggle; when provided a header checkbox will be shown
+   * above the rows. After touching this the parent can decide which rows to
+   * mark as selected (e.g. all or none).
+   */
+  allRowsSelected?: boolean;
+  onToggleAllRows?: () => void;
+
+  /** extra metadata badges shown in the header (right side) */
+  tempo?: number;
+  timeSignature?: string;
+  baseChord?: string;
+  /** callback invoked when user clicks the metadata area */
+  onMetadataClick?: () => void;
+
   onCellSelect: (rowId: string, cellId: string) => void;
   onToggleRowSelect: (rowId: string) => void;
   onDuplicateRows: (rowIds: string[]) => void;
@@ -235,6 +250,12 @@ export function ChordGrid({
   rows,
   selectedCell,
   selectedRows,
+  allRowsSelected = false,
+  onToggleAllRows,
+  tempo,
+  timeSignature,
+  baseChord,
+  onMetadataClick,
   onCellSelect,
   onToggleRowSelect,
   onDuplicateRows,
@@ -294,6 +315,68 @@ export function ChordGrid({
           strategy={verticalListSortingStrategy}
         >
           <div className="max-w-4xl mx-auto space-y-0 p-2 sm:p-4">
+            {/* Metadata header - always visible and clickable */}
+            <div className="flex items-center gap-1.5 py-1 border-b border-border">
+              {/* placeholder for checkbox column when not in select mode */}
+              {!onToggleAllRows && <div className="w-5" />}
+              
+              {/* master "select all" checkbox header */}
+              {onToggleAllRows && rows.length > 0 && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleAllRows();
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors p-0.5"
+                    title={allRowsSelected ? 'Deselect all rows' : 'Select all rows'}
+                  >
+                    {allRowsSelected ? (
+                      <CheckSquare size={14} className="text-primary" />
+                    ) : (
+                      <Square size={14} />
+                    )}
+                  </button>
+
+                  {/* placeholder for row number column */}
+                  <div className="text-muted-foreground text-xs w-5 text-right font-mono">
+                    #
+                  </div>
+
+                  {/* empty space matching chord cells area */}
+                  <div className="flex-1 flex gap-1">
+                    <span className="text-xs text-muted-foreground italic">
+                      select all
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* metadata labels (tempo / time / key) - always clickable */}
+              <div
+                className="flex items-center gap-3 ml-auto text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                onClick={() => onMetadataClick && onMetadataClick()}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onMetadataClick && onMetadataClick();
+                  }
+                }}
+              >
+                {tempo !== undefined && (
+                  <span className="whitespace-nowrap">Tempo: {tempo}</span>
+                )}
+                {timeSignature && (
+                  <span className="whitespace-nowrap">{timeSignature}</span>
+                )}
+                {baseChord && (
+                  <span className="whitespace-nowrap">Key: {baseChord}</span>
+                )}
+              </div>
+            </div>
+
             {rows.map((row, rowIndex) => (
               <div key={row.id}>
                 {/* Interstitial before this row */}

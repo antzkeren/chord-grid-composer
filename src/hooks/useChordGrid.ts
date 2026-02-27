@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ChordRow, ChordCell, KEY_FAMILIES, KeyFamily, generateId, transposeChord } from '@/types/chord';
 
 const BEATS_PER_ROW = 16;
@@ -29,6 +29,16 @@ export function useChordGrid() {
   const [songTitle, setSongTitle] = useState('');
   const [customChords, setCustomChords] = useState<Record<string, string[]>>({});
 
+  // Auto-select first cell on initial load
+  useEffect(() => {
+    if (rows.length > 0 && rows[0].cells.length > 0 && !selectedCell) {
+      setSelectedCell({
+        rowId: rows[0].id,
+        cellId: rows[0].cells[0].id
+      });
+    }
+  }, [rows, selectedCell]);
+
   const getSelectedCellData = useCallback(() => {
     if (!selectedCell) return null;
     const row = rows.find(r => r.id === selectedCell.rowId);
@@ -56,11 +66,35 @@ export function useChordGrid() {
     if (!currentCell || currentCell.isNote) return;
 
     // Check if it's a modifier
-    const modifiers = ['7', 'maj7', 'min', 'min7', 'sus4', 'sus2', 'add9', '6', 'dim7', 'Maj'];
-    if (modifiers.includes(chord)) {
+    const modifiers = ['7', 'maj7', 'maj', 'min', 'min7', 'min7b5', 'sus4', 'sus2', 'add9', '6', 'dim7', 'Maj', '9', '11', '13', 'maj9', 'maj13', 'add2', 'aug', 'dim'];
+    // Chromatic notes - used to change root note
+    const chromaticNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    
+    // Check if it's a chromatic note (root note change)
+    if (chromaticNotes.includes(chord)) {
+      // Only change root note if there's an existing chord in the cell
       if (currentCell.chord) {
-        // Remove existing modifiers first
-        let baseChord = currentCell.chord.replace(/(7|maj7|min7|sus4|sus2|add9|6|dim7)$/, '');
+        // Extract the modifier from current chord (everything after the root note)
+        const modifierMatch = currentCell.chord.match(/^[A-G][#b]?(.*)$/);
+        const modifier = modifierMatch ? modifierMatch[1] : '';
+        // Create new chord with new root + existing modifier
+        const newChord = chord + modifier;
+        updateCell({ chord: newChord });
+        // Add to custom chords
+        setCustomChords(prev => ({
+          ...prev,
+          [selectedKey.key]: [...new Set([...(prev[selectedKey.key] || []), newChord])]
+        }));
+      } else {
+        // No existing chord - treat as new chord selection
+        updateCell({ chord });
+        moveToNextCell();
+      }
+      // Don't auto-advance when root note is changed (if there was an existing chord)
+    } else if (modifiers.includes(chord)) {
+      if (currentCell.chord) {
+        // Remove existing modifiers first (including m7b5, m7, and min7 variants)
+        let baseChord = currentCell.chord.replace(/(7|maj7|maj|min7|m7b5|min7b5|min|m7|sus4|sus2|add9|6|dim7|9|11|13|maj9|maj13|add2|aug|dim)$/, '');
         // Remove bass note
         baseChord = baseChord.replace(/\/[A-G][#b]?$/, '');
         let newChord = baseChord;
@@ -74,7 +108,7 @@ export function useChordGrid() {
           updateCell({ chord: newChord });
         }
         // "Maj" converts minor to major (Dmin → D, then add Maj)
-        else if (chord === 'Maj') {
+        else if (chord === 'Maj' || chord === 'maj') {
           baseChord = baseChord.replace(/min$/, '');
           newChord = baseChord;
           updateCell({ chord: newChord });
@@ -91,14 +125,30 @@ export function useChordGrid() {
           newChord = baseChord + 'maj7';
           updateCell({ chord: newChord });
         }
-        // "min7" keeps minor and adds 7 (Dmin → Dmin7, or D → Dmin7)
+        // "min7" keeps minor and adds 7 (Dmin → Dmin7, or D → Dmin7, Dm7b5 → Dm7)
         else if (chord === 'min7') {
-          // If already minor, just add 7
-          if (baseChord.includes('min')) {
-            newChord = baseChord + '7';
+          // If already minor (min or m), just add 7 or convert from m7b5
+          if (baseChord.includes('min') || baseChord.endsWith('m')) {
+            // If it's m7b5, convert to m7
+            if (baseChord.endsWith('m7b5')) {
+              newChord = baseChord.replace(/m7b5$/, 'm7');
+            } else {
+              newChord = baseChord + '7';
+            }
           } else {
             // Add min7 to major chord
             newChord = baseChord + 'min7';
+          }
+          updateCell({ chord: newChord });
+        }
+        // "min7b5" converts minor to half-diminished (Dmin → Dm7b5)
+        else if (chord === 'min7b5') {
+          // If already minor (min or m), replace with m7b5
+          if (baseChord.includes('min') || baseChord.endsWith('m')) {
+            newChord = baseChord.replace(/min$|m$/, '') + 'm7b5';
+          } else {
+            // Add min7b5 to major chord
+            newChord = baseChord + 'm7b5';
           }
           updateCell({ chord: newChord });
         }

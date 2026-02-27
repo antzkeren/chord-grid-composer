@@ -20,14 +20,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-// Songs API
-// list/show may be public (visibility rules applied in controller),
-// but creation, updates and special actions require authentication.
-Route::get('songs', [SongController::class, 'index']);
-Route::get('songs/{song}', [SongController::class, 'show']);
-
+// Songs API - list and show require authentication to see private songs
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('songs', [SongController::class, 'index']);
+    Route::get('songs/{song}', [SongController::class, 'show']);
     Route::post('songs', [SongController::class, 'store']);
+    Route::put('songs/{song}', [SongController::class, 'update']);
     Route::patch('songs/{song}', [SongController::class, 'update']);
     Route::delete('songs/{song}', [SongController::class, 'destroy']);
 

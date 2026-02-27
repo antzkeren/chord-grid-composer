@@ -1,4 +1,4 @@
-import { KEY_FAMILIES, EXTRA_CHORDS, BASS_NOTES, KeyFamily } from '@/types/chord';
+import { KEY_FAMILIES, EXTRA_CHORDS, BASS_NOTES, CHROMATIC_NOTES, KeyFamily } from '@/types/chord';
 import { cn } from '@/lib/utils';
 import { Trash, X } from 'lucide-react';
 import { useState } from 'react';
@@ -147,16 +147,33 @@ export function ChordKeyboard({
         )}
 
         {activeTab === 'modifier' && (
-          <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start">
-            {EXTRA_CHORDS.map((mod) => (
-              <button
-                key={mod}
-                onClick={() => onChordSelect(mod)}
-                className="chord-button text-xs"
-              >
-                {mod}
-              </button>
-            ))}
+          <div className="space-y-2">
+            {/* Row 1: Chromatic notes - change root note */}
+            <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start">
+              <span className="text-[10px] text-muted-foreground w-full mb-1">Root:</span>
+              {CHROMATIC_NOTES.map((note) => (
+                <button
+                  key={note}
+                  onClick={() => onChordSelect(note)}
+                  className="chord-button text-xs"
+                >
+                  {note}
+                </button>
+              ))}
+            </div>
+            {/* Row 2: Modifiers */}
+            <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start">
+              <span className="text-[10px] text-muted-foreground w-full mb-1">Modifier:</span>
+              {EXTRA_CHORDS.map((mod) => (
+                <button
+                  key={mod}
+                  onClick={() => onChordSelect(mod)}
+                  className="chord-button text-xs"
+                >
+                  {mod}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

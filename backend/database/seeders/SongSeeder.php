@@ -28,6 +28,9 @@ class SongSeeder extends Seeder
             'artist' => 'The Beatles',
             'key' => 'C',
             'notes' => 'Classic Beatles song',
+            'tempo' => 72,
+            'time_signature' => '4/4',
+            'base_chord' => 'C',
             'user_id' => $user->id,
             'visibility' => 'public',
         ]);
@@ -75,6 +78,9 @@ class SongSeeder extends Seeder
             'artist' => 'John Lennon',
             'key' => 'C',
             'notes' => 'Peaceful and inspiring',
+            'tempo' => 75,
+            'time_signature' => '4/4',
+            'base_chord' => 'C',
             'user_id' => $user->id,
             'visibility' => 'public',
         ]);
@@ -114,6 +120,9 @@ class SongSeeder extends Seeder
             'artist' => 'Oasis',
             'key' => 'Em7',
             'notes' => null,
+            'tempo' => 87,
+            'time_signature' => '4/4',
+            'base_chord' => 'Em7',
             'user_id' => $user->id,
             'visibility' => 'public',
         ]);

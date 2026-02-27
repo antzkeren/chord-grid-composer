@@ -10,6 +10,11 @@ export interface Song {
   owner?: { id: number; name: string } | string; // owner may be name or object from API
   bookmark_count?: number;
   isBookmarked?: boolean; // local fallback
+
+  // metadata we now persist
+  tempo?: number;
+  timeSignature?: string;
+  baseChord?: string;
 }
 
 export interface SongLibrary {

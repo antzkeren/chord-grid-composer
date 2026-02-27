@@ -40,11 +40,25 @@ class SongController extends Controller
             'key' => 'nullable|string',
             'notes' => 'nullable|string',
             'visibility' => 'in:public,unlisted,private',
+            'tempo' => 'nullable|integer|min:1',
+            'time_signature' => 'nullable|string',
+            'base_chord' => 'nullable|string',
+            'rows' => 'nullable|array',
         ]);
 
         $song = new Song($validated);
         $song->user_id = $request->user()->id;
         $song->save();
+
+        // Save chord rows if provided
+        if (!empty($validated['rows'])) {
+            foreach ($validated['rows'] as $index => $row) {
+                $song->chordRows()->create([
+                    'row_index' => $index,
+                    'chords' => $row['cells'] ?? [],
+                ]);
+            }
+        }
 
         return response()->json($song->load('owner'), 201);
     }
@@ -79,9 +93,28 @@ class SongController extends Controller
             'key' => 'nullable|string',
             'notes' => 'nullable|string',
             'visibility' => 'in:public,unlisted,private',
+            'tempo' => 'nullable|integer|min:1',
+            'time_signature' => 'nullable|string',
+            'base_chord' => 'nullable|string',
+            'rows' => 'nullable|array',
         ]);
 
         $song->update($validated);
+
+        // Update chord rows if provided
+        if (!empty($validated['rows'])) {
+            // Delete existing chord rows
+            $song->chordRows()->delete();
+            
+            // Create new chord rows
+            foreach ($validated['rows'] as $index => $row) {
+                $song->chordRows()->create([
+                    'row_index' => $index,
+                    'chords' => $row['cells'] ?? [],
+                ]);
+            }
+        }
+
         return response()->json($song);
     }
 
@@ -122,7 +155,7 @@ class SongController extends Controller
     public function duplicate(Request $request, Song $song): JsonResponse
     {
         $user = $request->user();
-        $copy = $song->replicate(['title','artist','key','notes']);
+        $copy = $song->replicate(['title','artist','key','notes','tempo','time_signature','base_chord']);
         $copy->user_id = $user->id;
         $copy->original_song_id = $song->id;
         $copy->visibility = 'private';
