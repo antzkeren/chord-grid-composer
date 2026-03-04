@@ -13,6 +13,8 @@ return [
         'http://192.168.1.35:8080',
         'http://192.168.1.35:5173',
         'http://192.168.1.35:8081',
+        // Production - use FRONTEND_URL env variable
+        env('FRONTEND_URL', ''),
     ],
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
