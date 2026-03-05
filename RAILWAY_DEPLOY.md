@@ -25,15 +25,24 @@ Di Railway project → tab **"Variables"**, tambah:
 APP_ENV=production
 APP_DEBUG=false
 APP_KEY=base64:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=
-FRONTEND_URL=https://your-vercel-app.vercel.app
+FRONTEND_URL=https://chord-grid-composer.vercel.app
 
-# Database - GANTI dengan credentials dari step 2
+# Database - sudah dikonfigurasi
 DB_CONNECTION=mysql
-DB_HOST=containers.us.xxxx.railway.com
-DB_PORT=3306
+DB_HOST=nozomi.proxy.rlwy.net
+DB_PORT=57534
 DB_DATABASE=railway
 DB_USERNAME=root
-DB_PASSWORD=xxxxxx
+DB_PASSWORD=NcpnUaddxyYUvQdDepvdxZUiTIggrSVz
+```
+
+**CATATAN: Production Database Credentials:**
+```
+DB_HOST: nozomi.proxy.rlwy.net
+DB_PORT: 57534
+DB_DATABASE: railway
+DB_USERNAME: root
+DB_PASSWORD: NcpnUaddxyYUvQdDepvdxZUiTIggrSVz
 ```
 
 **Generate APP_KEY:**
@@ -45,9 +54,15 @@ php artisan key:generate
 
 ## 4. Build & Deploy
 
-1. Railway akan auto-detect Laravel dari `backend/composer.json`
-2. Klik **"Deploy"** atau tunggu auto-deploy dari GitHub
-3. Cek logs untuk memastikan tidak ada error
+1. Railway akan auto-detect Dockerfile dari folder `backend`
+2. Pastikan Root Directory = `backend`
+3. Klik **"Deploy"** atau tunggu auto-deploy dari GitHub
+4. Cek logs untuk memastikan tidak ada error
+
+**Penting:** Pastikan file-file ini ada di folder `backend/`:
+- `Dockerfile` - Mendefinisikan image PHP dengan ekstensi `intl` dan `zip`
+- `railway.json` - Konfigurasi build Railway
+- `composer.json` dan `composer.lock` - Dependencies Laravel
 
 ## 5. Run Migration
 
@@ -79,5 +94,5 @@ Copy URL Railway (contoh: `https://chord-grid-composer-backend.up.railway.app`)
 
 Nanti untuk Vercel frontend, tambah env:
 ```
-VITE_API_URL=https://chord-grid-composer-backend.up.railway.app/api
+VITE_API_URL=https://chord-grid-composer.up.railway.app/api
 ```
