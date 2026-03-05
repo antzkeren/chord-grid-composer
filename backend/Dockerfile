@@ -1,4 +1,3 @@
-# Use official PHP image with required extensions
 FROM php:8.3-fpm-bookworm
 
 # Install system dependencies and required PHP extensions
@@ -20,7 +19,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy composer files
+# Copy composer files first for better caching
 COPY composer.json composer.lock ./
 
 # Install dependencies
@@ -29,15 +28,14 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interactio
 # Copy application files
 COPY . .
 
-# Create .env if not exists (copy from .env.example)
+# Create .env if not exists
 RUN test -f .env || cp .env.example .env
 
 # Generate Laravel key
 RUN php artisan key:generate --force
 
 # Set permissions
-RUN chmod -R 755 storage \
-    && chmod -R 755 bootstrap/cache \
+RUN chmod -R 755 storage bootstrap/cache \
     && chown -R www-data:www-data /var/www
 
 # Create nginx config
@@ -46,6 +44,8 @@ RUN echo 'server { \
     server_name localhost; \
     root /var/www/public; \
     index index.php index.html; \
+    access_log /var/log/nginx/access.log; \
+    error_log /var/log/nginx/error.log; \
     location / { \
         try_files $uri $uri/ /index.php?$query_string; \
     } \
@@ -57,8 +57,7 @@ RUN echo 'server { \
     } \
 }' > /etc/nginx/sites-available/default
 
-# Expose port
+# Run nginx and php-fpm
 EXPOSE 8080
 
-# Start nginx and php-fpm
 CMD service nginx start && php-fpm
