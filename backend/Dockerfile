@@ -28,6 +28,9 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interactio
 # Copy application files
 COPY . .
 
+# Create .env if not exists (copy from .env.example)
+RUN test -f .env || cp .env.example .env
+
 # Generate Laravel key
 RUN php artisan key:generate --force
 
