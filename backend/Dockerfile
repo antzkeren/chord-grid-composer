@@ -1,5 +1,5 @@
 # Use official PHP image with required extensions
-FROM php:8.2-fpm-bookworm AS base
+FROM php:8.3-fpm-bookworm AS base
 
 # Install system dependencies and required PHP extensions
 RUN apt-get update && apt-get install -y \
