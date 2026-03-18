@@ -47,7 +47,6 @@ class CreateSharedSongsTable extends Migration
             ],
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->addKey('share_id', false, true);
         $this->forge->addForeignKey('user_id', 'users', 'id', 'SET NULL', 'CASCADE');
         $this->forge->createTable('shared_songs');
     }
