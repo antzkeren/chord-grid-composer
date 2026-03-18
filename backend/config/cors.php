@@ -3,20 +3,10 @@
 return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
     'allowed_methods' => ['*'],
-    'allowed_origins' => [
-        'http://localhost:8080', 
-        'http://localhost:8081', // Vite auto‑switched port
-        'http://localhost:5173', 
-        'http://127.0.0.1:5173', 
-        'http://127.0.0.1:8080',
-        'http://127.0.0.1:8081',
-        'http://192.168.1.35:8080',
-        'http://192.168.1.35:5173',
-        'http://192.168.1.35:8081',
-    ],
+    'allowed_origins' => ['*'],
     'allowed_origins_patterns' => [
-        '^https?://(www\.)?chord-grid-composer\.vercel\.app$',
-        '^https?://chord-grid-composer-.*\.vercel\.app$',
+        // Allow ALL origins - for Railway, Vercel, Postman, and any domain
+        '.*',
     ],
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
