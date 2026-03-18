@@ -94,5 +94,5 @@ Copy URL Railway (contoh: `https://chord-grid-composer-backend.up.railway.app`)
 
 Nanti untuk Vercel frontend, tambah env:
 ```
-VITE_API_URL=https://chord-grid-composer.up.railway.app/api
+VITE_API_URL=https://chord-grid-composer-production.up.railway.app/api
 ```

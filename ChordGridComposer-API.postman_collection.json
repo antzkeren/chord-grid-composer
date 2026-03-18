@@ -1,0 +1,382 @@
+{
+  "info": {
+    "name": "Chord Grid Composer API",
+    "description": "Postman collection untuk testing API Chord Grid Composer di Railway",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://chord-grid-composer-backend.up.railway.app",
+      "type": "string",
+      "description": "GANTI dengan URL Railway kamu"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string",
+      "description": "Token akan disimpan di sini setelah login"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/register",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Google Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/google-login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"google_id\": \"123456789\",\n  \"email\": \"user@gmail.com\",\n  \"name\": \"Google User\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/user",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/logout",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/forgot-password",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/reset-password",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"reset-token-here\",\n  \"email\": \"test@example.com\",\n  \"password\": \"newpassword123\",\n  \"password_confirmation\": \"newpassword123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Songs",
+      "item": [
+        {
+          "name": "Get All Songs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/songs",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Song by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/songs/1",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Create Song",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/songs",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lagu Baru\",\n  \"artist\": \"Artist Name\",\n  \"key\": \"C\",\n  \"notes\": \"Catatan lagu\",\n  \"visibility\": \"private\",\n  \"tempo\": 120,\n  \"time_signature\": \"4/4\",\n  \"base_chord\": \"C\",\n  \"rows\": [\n    {\n      \"cells\": [\"C\", \"G\", \"Am\", \"F\"]\n    },\n    {\n      \"cells\": [\"C\", \"G\", \"F\", \"G\"]\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Song",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/songs/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Judul Diubah\",\n  \"artist\": \"Artist Name\",\n  \"key\": \"G\",\n  \"visibility\": \"public\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Song",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/songs/1",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Bookmark Song",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/songs/1/bookmark",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Duplicate Song",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/songs/1/duplicate",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chords",
+      "item": [
+        {
+          "name": "Get All Chords",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/chords"
+          }
+        },
+        {
+          "name": "Get Chord by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/chords/1"
+          }
+        },
+        {
+          "name": "Create Chord",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/chords",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"song_id\": 1,\n  \"note\": \"C4\",\n  \"chord_name\": \"C Major\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Chord",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/chords/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chord_name\": \"C Minor\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Chord",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/chords/1"
+          }
+        },
+        {
+          "name": "Create Chord Row",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/chord-rows",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"song_id\": 1,\n  \"row_index\": 0,\n  \"chords\": [\"C\", \"G\", \"Am\", \"F\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Chord Row",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/chord-rows/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chords\": [\"G\", \"C\", \"D\", \"Em\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Chord Row",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/chord-rows/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Share",
+      "item": [
+        {
+          "name": "Create Shared Song",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/share",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lagu Share\",\n  \"owner_name\": \"Pemilik Lagu\",\n  \"rows\": [\n    {\n      \"cells\": [\"C\", \"Am\", \"F\", \"G\"]\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Shared Song",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/share/{shareId}",
+            "header": []
+          }
+        }
+      ]
+    }
+  ]
+}
