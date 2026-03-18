@@ -29,10 +29,16 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interactio
 # Copy application files
 COPY . .
 
-# Create .env if not exists
+# Remove local .env to use Railway env vars
+RUN rm -f .env
+
+# Create .env with default values (Railway env vars will override these)
+RUN cp .env.example .env || true
+
+# Create .env with default values (will be overridden by Railway env vars)
 RUN test -f .env || cp .env.example .env
 
-# Generate Laravel key
+# Generate Laravel key if not set
 RUN php artisan key:generate --force
 
 # Set permissions
