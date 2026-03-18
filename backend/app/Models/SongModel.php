@@ -29,13 +29,6 @@ class SongModel extends Model
     protected $createdField     = 'created_at';
     protected $updatedField     = 'updated_at';
 
-    protected $casts = [
-        'visibility' => 'string',
-        'tempo' => 'integer',
-        'time_signature' => 'string',
-        'base_chord' => 'string',
-    ];
-
     /**
      * The user who created/owns this song.
      */

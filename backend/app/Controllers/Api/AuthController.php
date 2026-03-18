@@ -50,12 +50,13 @@ class AuthController extends BaseController
                 ->setJSON(['message' => 'Failed to create user']);
         }
 
-        $token = $this->generateToken($user);
+        $newUser = $this->userModel->find($user);
+        $token = $this->generateToken($newUser);
 
         return $this->response
             ->setStatusCode(Response::HTTP_CREATED)
             ->setJSON([
-                'user'  => $this->userModel->find($user),
+                'user'  => $newUser,
                 'token' => $token,
             ]);
     }

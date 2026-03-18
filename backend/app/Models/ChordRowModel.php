@@ -22,10 +22,6 @@ class ChordRowModel extends Model
     protected $createdField     = 'created_at';
     protected $updatedField     = 'updated_at';
 
-    protected $casts = [
-        'chords' => 'array',
-    ];
-
     public function song()
     {
         return $this->belongsTo(SongModel::class, 'song_id');

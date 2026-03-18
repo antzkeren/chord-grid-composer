@@ -24,10 +24,6 @@ class SharedSongModel extends Model
     protected $createdField     = 'created_at';
     protected $updatedField     = 'updated_at';
 
-    protected $casts = [
-        'rows' => 'array',
-    ];
-
     /**
      * Get the user who shared this song.
      */

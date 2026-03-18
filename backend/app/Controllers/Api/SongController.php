@@ -5,6 +5,7 @@ namespace App\Controllers\Api;
 use App\Controllers\BaseController;
 use App\Models\SongModel;
 use App\Models\ChordRowModel;
+use App\Models\UserModel;
 use CodeIgniter\HTTP\Response;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -27,12 +28,23 @@ class SongController extends BaseController
      */
     public function index()
     {
+        $userId = null;
         $user = $this->getAuthenticatedUser();
+        if ($user) {
+            $userId = $user['id'];
+        }
         
-        $songs = $this->songModel
-            ->with(['chords', 'chordRows', 'owner'])
-            ->visibleTo($user ? $user['id'] : null)
-            ->findAll();
+        $builder = $this->songModel->builder();
+        
+        // Public songs are always visible
+        $builder->where('visibility', 'public');
+        
+        // If user is logged in, also show their private/unlisted songs
+        if ($userId) {
+            $builder->orWhere('user_id', $userId);
+        }
+        
+        $songs = $this->songModel->findAll();
 
         return $this->response->setJSON($songs);
     }
@@ -100,7 +112,7 @@ class SongController extends BaseController
             }
         }
 
-        $song = $this->songModel->with(['owner'])->find($songId);
+        $song = $this->songModel->find($songId);
 
         return $this->response
             ->setStatusCode(Response::HTTP_CREATED)
@@ -115,7 +127,7 @@ class SongController extends BaseController
     {
         $user = $this->getAuthenticatedUser();
         
-        $song = $this->songModel->with(['chords', 'chordRows', 'owner'])->find($id);
+        $song = $this->songModel->find($id);
 
         if (!$song) {
             return $this->response

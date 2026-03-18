@@ -23,7 +23,7 @@ class ChordController extends BaseController
      */
     public function index()
     {
-        $chords = $this->chordModel->with('song')->findAll();
+        $chords = $this->chordModel->findAll();
         return $this->response->setJSON($chords);
     }
 
@@ -68,7 +68,7 @@ class ChordController extends BaseController
      */
     public function show($id = null)
     {
-        $chord = $this->chordModel->with('song')->find($id);
+        $chord = $this->chordModel->find($id);
 
         if (!$chord) {
             return $this->response
